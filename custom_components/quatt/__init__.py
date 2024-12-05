@@ -3,6 +3,7 @@
 For more details about this integration, please refer to
 https://github.com/marcoboers/home-assistant-quatt
 """
+
 from __future__ import annotations
 
 from homeassistant.config_entries import ConfigEntry
@@ -26,6 +27,9 @@ PLATFORMS: list[Platform] = [
     Platform.BINARY_SENSOR,
     Platform.SENSOR,
 ]
+
+# Target config entry version
+TARGET_VERSION = 2
 
 
 # https://developers.home-assistant.io/docs/config_entries_index/#setting-up-an-entry
@@ -78,12 +82,17 @@ async def async_migrate_entry(hass: HomeAssistant, config_entry: ConfigEntry) ->
     if config_entry.version == 1:
         # Migrate CONF_POWER_SENSOR from data to options
         # Set the unique_id of the cic
-        LOGGER.debug("Migrating config entry from version '%s'", config_entry.version)
+        LOGGER.debug(
+            "Migrating config entry from version '%s' to version 2",
+            config_entry.version,
+        )
 
         # The old version does not have a unique_id so we get the CIC hostname and set it
         # Return that the migration failed in case the retrieval fails
         try:
-            hostname_unique_id = await _get_cic_hostname(hass=hass, ip_address=config_entry.data[CONF_IP_ADDRESS])
+            hostname_unique_id = await _get_cic_hostname(
+                hass=hass, ip_address=config_entry.data[CONF_IP_ADDRESS]
+            )
         except QuattApiClientAuthenticationError as exception:
             LOGGER.warning(exception)
             return False
@@ -98,7 +107,9 @@ async def async_migrate_entry(hass: HomeAssistant, config_entry: ConfigEntry) ->
             if (hostname_unique_id is not None) and (len(hostname_unique_id) >= 3):
                 # Uppercase the first 3 characters CIC-xxxxxxxx-xxxx-xxxx-xxxxxxxxxxxx
                 # This enables the correct match on DHCP hostname
-                hostname_unique_id = hostname_unique_id[:3].upper() + hostname_unique_id[3:]
+                hostname_unique_id = (
+                    hostname_unique_id[:3].upper() + hostname_unique_id[3:]
+                )
 
                 new_data = {**config_entry.data}
                 new_options = {**config_entry.options}
@@ -113,7 +124,7 @@ async def async_migrate_entry(hass: HomeAssistant, config_entry: ConfigEntry) ->
                     data=new_data,
                     options=new_options,
                     unique_id=hostname_unique_id,
-                    version=2
+                    version=TARGET_VERSION,
                 )
             else:
                 return False

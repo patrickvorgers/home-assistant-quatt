@@ -13,6 +13,7 @@ class QuattSensorEntityDescription(SensorEntityDescription, frozen_or_thawed=Tru
     """A class that describes Quatt sensor entities."""
 
     quatt_duo: bool = False
+    quatt_device_info: str = ""
 
 
 class QuattEntity(CoordinatorEntity):
@@ -38,10 +39,10 @@ class QuattEntity(CoordinatorEntity):
 
     @property
     def device_info(self):
-        """Return the device information."""
+        """Return the device info."""
         return {
-            "identifiers": {(DOMAIN, self.coordinator.config_entry.entry_id)},
-            "name": "Heatpump",
-            "manufacturer": NAME,
-            "model": self.coordinator.getValue("system.hostName"),
+            "identifiers": {(DOMAIN, self._device_id)},
+            "name": self._device_name,
+            "manufacturer": "Quatt",
+            "model": "-",
         }
