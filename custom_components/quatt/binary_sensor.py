@@ -169,12 +169,17 @@ class QuattBinarySensor(QuattEntity, BinarySensorEntity):
     @property
     def entity_registry_enabled_default(self):
         """Return whether the sensor should be enabled by default."""
-        # Only check the duo property when set, enable when duo found
-        if self.entity_description.entity_registry_enabled_default and self.entity_description.quatt_duo:
-            return self.coordinator.heatpump2Active()
+        value = self.entity_description.entity_registry_enabled_default
 
-        # For all other sensors
-        return self.entity_description.entity_registry_enabled_default
+        # Only check the duo property when set, enable when duo found
+        if value and self.entity_description.quatt_duo:
+            value = self.coordinator.heatpump2Active()
+
+        # Only check the openthern when set, enable when opentherm found
+        if value and self.entity_description.quatt_opentherm:
+            value = self.coordinator.boilerOpenTherm()
+
+        return value
 
 
     @property

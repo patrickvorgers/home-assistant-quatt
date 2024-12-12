@@ -221,7 +221,6 @@ SENSORS = [
         icon="mdi:lightning-bolt",
         native_unit_of_measurement="W",
         device_class=SensorDeviceClass.POWER,
-        entity_registry_enabled_default=False,
         suggested_display_precision=0,
         state_class=SensorStateClass.MEASUREMENT,
         quatt_duo=True,
@@ -233,10 +232,19 @@ SENSORS = [
         icon="mdi:heat-wave",
         native_unit_of_measurement="W",
         device_class=SensorDeviceClass.POWER,
-        entity_registry_enabled_default=False,
         suggested_display_precision=0,
         state_class=SensorStateClass.MEASUREMENT,
         quatt_duo=True,
+        quatt_device_info=DEVICE_CIC_ID,
+    ),
+    QuattSensorEntityDescription(
+        name="Total system power",
+        key="computedSystemPower",
+        icon="mdi:heat-wave",
+        native_unit_of_measurement="W",
+        device_class=SensorDeviceClass.POWER,
+        suggested_display_precision=0,
+        state_class=SensorStateClass.MEASUREMENT,
         quatt_device_info=DEVICE_CIC_ID,
     ),
     QuattSensorEntityDescription(
@@ -245,7 +253,6 @@ SENSORS = [
         icon="mdi:thermometer-water",
         native_unit_of_measurement=UnitOfTemperature.CELSIUS,
         device_class=SensorDeviceClass.TEMPERATURE,
-        entity_registry_enabled_default=False,
         suggested_display_precision=2,
         state_class=SensorStateClass.MEASUREMENT,
         quatt_duo=True,
@@ -256,7 +263,6 @@ SENSORS = [
         key="computedQuattCop",
         icon="mdi:heat-pump",
         native_unit_of_measurement="CoP",
-        entity_registry_enabled_default=False,
         suggested_display_precision=2,
         state_class=SensorStateClass.MEASUREMENT,
         quatt_duo=True,
@@ -282,6 +288,16 @@ SENSORS = [
         suggested_display_precision=2,
         state_class=SensorStateClass.MEASUREMENT,
         quatt_device_info=DEVICE_BOILER_ID,
+    ),
+    QuattSensorEntityDescription(
+        name="Boiler heat power",
+        key="boiler.computedBoilerHeatPower",
+        icon="mdi:heat-wave",
+        native_unit_of_measurement="W",
+        device_class=SensorDeviceClass.POWER,
+        suggested_display_precision=0,
+        state_class=SensorStateClass.MEASUREMENT,
+        quatt_device_info=DEVICE_CIC_ID,
     ),
     # Flowmeter
     QuattSensorEntityDescription(
@@ -403,15 +419,17 @@ class QuattSensor(QuattEntity, SensorEntity):
     @property
     def entity_registry_enabled_default(self):
         """Return whether the sensor should be enabled by default."""
-        # Only check the duo property when set, enable when duo found
-        if (
-            self.entity_description.entity_registry_enabled_default
-            and self.entity_description.quatt_duo
-        ):
-            return self.coordinator.heatpump2Active()
+        value = self.entity_description.entity_registry_enabled_default
 
-        # For all other sensors
-        return self.entity_description.entity_registry_enabled_default
+        # Only check the duo property when set, enable when duo found
+        if value and self.entity_description.quatt_duo:
+            value = self.coordinator.heatpump2Active()
+
+        # Only check the openthern when set, enable when opentherm found
+        if value and self.entity_description.quatt_opentherm:
+            value = self.coordinator.boilerOpenTherm()
+
+        return value
 
     @property
     def native_value(self) -> str:
