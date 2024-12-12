@@ -49,7 +49,6 @@ BINARY_SENSORS = [
         key="hp2.silentModeStatus",
         translation_key="hp_silentModeStatus",
         icon="mdi:sleep",
-        quatt_duo=True,
         quatt_device_info=DEVICE_HEATPUMP2_ID,
     ),
     QuattSensorEntityDescription(
@@ -57,14 +56,12 @@ BINARY_SENSORS = [
         key="hp2.limitedByCop",
         translation_key="hp_silentModeStatus",
         icon="mdi:arrow-collapse-up",
-        quatt_duo=True,
         quatt_device_info=DEVICE_HEATPUMP2_ID,
     ),
     QuattSensorEntityDescription(
         name="Defrost",
         key="hp2.computedDefrost",
         icon="mdi:snowflake",
-        quatt_duo=True,
         quatt_device_info=DEVICE_HEATPUMP2_ID,
     ),
     # Boiler
