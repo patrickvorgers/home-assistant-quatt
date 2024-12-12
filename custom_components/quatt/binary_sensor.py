@@ -16,23 +16,23 @@ from .const import (
     DOMAIN,
 )
 from .coordinator import QuattDataUpdateCoordinator
-from .entity import QuattEntity, QuattSensorEntityDescription
+from .entity import QuattBinarySensorEntityDescription, QuattEntity
 
 BINARY_SENSORS = {
     DEVICE_HEATPUMP1_ID: [
-        QuattSensorEntityDescription(
+        QuattBinarySensorEntityDescription(
             name="Silentmode",
             key="hp1.silentModeStatus",
             translation_key="hp_silentModeStatus",
             icon="mdi:sleep",
         ),
-        QuattSensorEntityDescription(
+        QuattBinarySensorEntityDescription(
             name="Limited by COP",
             key="hp1.limitedByCop",
             translation_key="hp_silentModeStatus",
             icon="mdi:arrow-collapse-up",
         ),
-        QuattSensorEntityDescription(
+        QuattBinarySensorEntityDescription(
             name="Defrost",
             key="hp1.computedDefrost",
             translation_key="hp_silentModeStatus",
@@ -40,73 +40,73 @@ BINARY_SENSORS = {
         ),
     ],
     DEVICE_HEATPUMP2_ID: [
-        QuattSensorEntityDescription(
+        QuattBinarySensorEntityDescription(
             name="Silentmode",
             key="hp2.silentModeStatus",
             translation_key="hp_silentModeStatus",
             icon="mdi:sleep",
         ),
-        QuattSensorEntityDescription(
+        QuattBinarySensorEntityDescription(
             name="Limited by COP",
             key="hp2.limitedByCop",
             translation_key="hp_silentModeStatus",
             icon="mdi:arrow-collapse-up",
         ),
-        QuattSensorEntityDescription(
+        QuattBinarySensorEntityDescription(
             name="Defrost",
             key="hp2.computedDefrost",
             icon="mdi:snowflake",
         ),
     ],
     DEVICE_BOILER_ID: [
-        QuattSensorEntityDescription(
+        QuattBinarySensorEntityDescription(
             name="Boiler",
             key="boiler.otFbChModeActive",
             icon="mdi:heating-coil",
             quatt_opentherm=True,
         ),
-        QuattSensorEntityDescription(
+        QuattBinarySensorEntityDescription(
             name="Domestic hot water",
             key="boiler.otFbDhwActive",
             icon="mdi:water-boiler",
             quatt_opentherm=True,
         ),
-        QuattSensorEntityDescription(
+        QuattBinarySensorEntityDescription(
             name="Flame",
             key="boiler.otFbFlameOn",
             icon="mdi:fire",
             quatt_opentherm=True,
         ),
-        QuattSensorEntityDescription(
+        QuattBinarySensorEntityDescription(
             name="Heating",
             key="boiler.otTbCH",
             icon="mdi:heating-coil",
         ),
-        QuattSensorEntityDescription(
+        QuattBinarySensorEntityDescription(
             name="On/off mode",
             key="boiler.oTtbTurnOnOffBoilerOn",
             icon="mdi:water-boiler",
         ),
     ],
     DEVICE_THERMOSTAT_ID: [
-        QuattSensorEntityDescription(
+        QuattBinarySensorEntityDescription(
             name="Heating",
             key="thermostat.otFtChEnabled",
             icon="mdi:home-thermometer",
         ),
-        QuattSensorEntityDescription(
+        QuattBinarySensorEntityDescription(
             name="Domestic hot water",
             key="thermostat.otFtDhwEnabled",
             icon="mdi:water-thermometer",
         ),
-        QuattSensorEntityDescription(
+        QuattBinarySensorEntityDescription(
             name="Cooling",
             key="thermostat.otFtCoolingEnabled",
             icon="mdi:snowflake-thermometer",
         ),
     ],
     DEVICE_CIC_ID: [
-        QuattSensorEntityDescription(
+        QuattBinarySensorEntityDescription(
             name="QC pump protection",
             key="qc.stickyPumpProtectionEnabled",
             icon="mdi:shield-refresh-outline",
@@ -157,7 +157,7 @@ class QuattBinarySensor(QuattEntity, BinarySensorEntity):
         device_id : str,
         sensor_key: str,
         coordinator: QuattDataUpdateCoordinator,
-        entity_description: QuattSensorEntityDescription,
+        entity_description: QuattBinarySensorEntityDescription,
     ) -> None:
         """Initialize the binary_sensor class."""
         super().__init__(coordinator, sensor_key)

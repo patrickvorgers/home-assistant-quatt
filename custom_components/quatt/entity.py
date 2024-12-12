@@ -2,15 +2,21 @@
 
 from __future__ import annotations
 
+from homeassistant.components.binary_sensor import BinarySensorEntityDescription
 from homeassistant.components.sensor import SensorEntityDescription
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
 
-from .const import ATTRIBUTION, DOMAIN, NAME
+from .const import ATTRIBUTION, DOMAIN
 from .coordinator import QuattDataUpdateCoordinator
 
 
 class QuattSensorEntityDescription(SensorEntityDescription, frozen_or_thawed=True):
     """A class that describes Quatt sensor entities."""
+
+    quatt_opentherm: bool = False
+
+class QuattBinarySensorEntityDescription(BinarySensorEntityDescription, frozen_or_thawed=True):
+    """A class that describes Quatt binary sensor entities."""
 
     quatt_opentherm: bool = False
 
