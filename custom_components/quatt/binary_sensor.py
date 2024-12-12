@@ -3,10 +3,8 @@ from __future__ import annotations
 
 import logging
 
-from homeassistant.components.binary_sensor import (
-    BinarySensorEntity,
-    BinarySensorEntityDescription,
-)
+from homeassistant.components.binary_sensor import BinarySensorEntity
+from homeassistant.core import HomeAssistant
 
 from .const import (
     DEVICE_BOILER_ID,
@@ -20,128 +18,133 @@ from .const import (
 from .coordinator import QuattDataUpdateCoordinator
 from .entity import QuattEntity, QuattSensorEntityDescription
 
-BINARY_SENSORS = [
-    # Heatpump 1
-    QuattSensorEntityDescription(
-        name="Silentmode",
-        key="hp1.silentModeStatus",
-        translation_key="hp_silentModeStatus",
-        icon="mdi:sleep",
-        quatt_device_info=DEVICE_HEATPUMP1_ID,
-    ),
-    QuattSensorEntityDescription(
-        name="Limited by COP",
-        key="hp1.limitedByCop",
-        translation_key="hp_silentModeStatus",
-        icon="mdi:arrow-collapse-up",
-        quatt_device_info=DEVICE_HEATPUMP1_ID,
-    ),
-    QuattSensorEntityDescription(
-        name="Defrost",
-        key="hp1.computedDefrost",
-        translation_key="hp_silentModeStatus",
-        icon="mdi:snowflake",
-        quatt_device_info=DEVICE_HEATPUMP1_ID,
-    ),
-    # Heatpump 2
-    QuattSensorEntityDescription(
-        name="Silentmode",
-        key="hp2.silentModeStatus",
-        translation_key="hp_silentModeStatus",
-        icon="mdi:sleep",
-        quatt_device_info=DEVICE_HEATPUMP2_ID,
-    ),
-    QuattSensorEntityDescription(
-        name="Limited by COP",
-        key="hp2.limitedByCop",
-        translation_key="hp_silentModeStatus",
-        icon="mdi:arrow-collapse-up",
-        quatt_device_info=DEVICE_HEATPUMP2_ID,
-    ),
-    QuattSensorEntityDescription(
-        name="Defrost",
-        key="hp2.computedDefrost",
-        icon="mdi:snowflake",
-        quatt_device_info=DEVICE_HEATPUMP2_ID,
-    ),
-    # Boiler
-    QuattSensorEntityDescription(
-        name="Boiler",
-        key="boiler.otFbChModeActive",
-        icon="mdi:heating-coil",
-        quatt_device_info=DEVICE_BOILER_ID,
-    ),
-    QuattSensorEntityDescription(
-        name="Domestic hot water",
-        key="boiler.otFbDhwActive",
-        icon="mdi:water-boiler",
-        quatt_device_info=DEVICE_BOILER_ID,
-    ),
-    QuattSensorEntityDescription(
-        name="Flame",
-        key="boiler.otFbFlameOn",
-        icon="mdi:fire",
-        quatt_device_info=DEVICE_BOILER_ID,
-    ),
-    QuattSensorEntityDescription(
-        name="Heating",
-        key="boiler.otTbCH",
-        icon="mdi:heating-coil",
-        quatt_device_info=DEVICE_BOILER_ID,
-    ),
-    QuattSensorEntityDescription(
-        name="On/off mode",
-        key="boiler.oTtbTurnOnOffBoilerOn",
-        icon="mdi:water-boiler",
-        quatt_device_info=DEVICE_BOILER_ID,
-    ),
-    # Thermostat
-    QuattSensorEntityDescription(
-        name="Heating",
-        key="thermostat.otFtChEnabled",
-        icon="mdi:home-thermometer",
-        quatt_device_info=DEVICE_THERMOSTAT_ID,
-    ),
-    QuattSensorEntityDescription(
-        name="Domestic hot water",
-        key="thermostat.otFtDhwEnabled",
-        icon="mdi:water-thermometer",
-        quatt_device_info=DEVICE_THERMOSTAT_ID,
-    ),
-    QuattSensorEntityDescription(
-        name="Cooling",
-        key="thermostat.otFtCoolingEnabled",
-        icon="mdi:snowflake-thermometer",
-        quatt_device_info=DEVICE_THERMOSTAT_ID,
-    ),
-    # QC
-    QuattSensorEntityDescription(
-        name="QC pump protection",
-        key="qc.stickyPumpProtectionEnabled",
-        icon="mdi:shield-refresh-outline",
-        quatt_device_info=DEVICE_CIC_ID,
-    ),
-]
+BINARY_SENSORS = {
+    DEVICE_HEATPUMP1_ID: [
+        QuattSensorEntityDescription(
+            name="Silentmode",
+            key="hp1.silentModeStatus",
+            translation_key="hp_silentModeStatus",
+            icon="mdi:sleep",
+        ),
+        QuattSensorEntityDescription(
+            name="Limited by COP",
+            key="hp1.limitedByCop",
+            translation_key="hp_silentModeStatus",
+            icon="mdi:arrow-collapse-up",
+        ),
+        QuattSensorEntityDescription(
+            name="Defrost",
+            key="hp1.computedDefrost",
+            translation_key="hp_silentModeStatus",
+            icon="mdi:snowflake",
+        ),
+    ],
+    DEVICE_HEATPUMP2_ID: [
+        QuattSensorEntityDescription(
+            name="Silentmode",
+            key="hp2.silentModeStatus",
+            translation_key="hp_silentModeStatus",
+            icon="mdi:sleep",
+        ),
+        QuattSensorEntityDescription(
+            name="Limited by COP",
+            key="hp2.limitedByCop",
+            translation_key="hp_silentModeStatus",
+            icon="mdi:arrow-collapse-up",
+        ),
+        QuattSensorEntityDescription(
+            name="Defrost",
+            key="hp2.computedDefrost",
+            icon="mdi:snowflake",
+        ),
+    ],
+    DEVICE_BOILER_ID: [
+        QuattSensorEntityDescription(
+            name="Boiler",
+            key="boiler.otFbChModeActive",
+            icon="mdi:heating-coil",
+            quatt_opentherm=True,
+        ),
+        QuattSensorEntityDescription(
+            name="Domestic hot water",
+            key="boiler.otFbDhwActive",
+            icon="mdi:water-boiler",
+            quatt_opentherm=True,
+        ),
+        QuattSensorEntityDescription(
+            name="Flame",
+            key="boiler.otFbFlameOn",
+            icon="mdi:fire",
+            quatt_opentherm=True,
+        ),
+        QuattSensorEntityDescription(
+            name="Heating",
+            key="boiler.otTbCH",
+            icon="mdi:heating-coil",
+        ),
+        QuattSensorEntityDescription(
+            name="On/off mode",
+            key="boiler.oTtbTurnOnOffBoilerOn",
+            icon="mdi:water-boiler",
+        ),
+    ],
+    DEVICE_THERMOSTAT_ID: [
+        QuattSensorEntityDescription(
+            name="Heating",
+            key="thermostat.otFtChEnabled",
+            icon="mdi:home-thermometer",
+        ),
+        QuattSensorEntityDescription(
+            name="Domestic hot water",
+            key="thermostat.otFtDhwEnabled",
+            icon="mdi:water-thermometer",
+        ),
+        QuattSensorEntityDescription(
+            name="Cooling",
+            key="thermostat.otFtCoolingEnabled",
+            icon="mdi:snowflake-thermometer",
+        ),
+    ],
+    DEVICE_CIC_ID: [
+        QuattSensorEntityDescription(
+            name="QC pump protection",
+            key="qc.stickyPumpProtectionEnabled",
+            icon="mdi:shield-refresh-outline",
+        ),
+    ],
+}
 
 _LOGGER = logging.getLogger(__name__)
 
 
-async def async_setup_entry(hass, entry, async_add_devices):
+async def async_setup_entry(hass: HomeAssistant, entry, async_add_devices):
     """Set up the binary_sensor platform."""
     coordinator = hass.data[DOMAIN][entry.entry_id]
 
-    device_sensors = [
-        QuattBinarySensor(
-            coordinator=coordinator,
-            device_name=device["name"],
-            device_id=device["id"],
-            sensor_key=entity_description.key,
-            entity_description=entity_description
-        )
-        for device in DEVICE_LIST
-        for entity_description in BINARY_SENSORS
-        if entity_description.quatt_device_info == device["id"]
-    ]
+    device_sensors = []
+
+    for device in DEVICE_LIST:
+        device_id = device["id"]
+        if device_id not in BINARY_SENSORS:
+            continue
+
+        if device_id == DEVICE_HEATPUMP2_ID and not coordinator.heatpump2Active():
+            continue
+
+        for entity_description in BINARY_SENSORS[device_id]:
+            if entity_description.quatt_opentherm and not coordinator.boilerOpenTherm():
+                continue
+
+            device_sensors.append(
+                QuattBinarySensor(
+                    coordinator=coordinator,
+                    device_name=device["name"],
+                    device_id=device_id,
+                    sensor_key=entity_description.key,
+                    entity_description=entity_description,
+                )
+            )
+
     async_add_devices(device_sensors)
 
 
@@ -169,22 +172,10 @@ class QuattBinarySensor(QuattEntity, BinarySensorEntity):
     @property
     def entity_registry_enabled_default(self):
         """Return whether the sensor should be enabled by default."""
-        value = self.entity_description.entity_registry_enabled_default
-
-        # Only check the duo property when set, enable when duo found
-        if value and self.entity_description.quatt_duo:
-            value = self.coordinator.heatpump2Active()
-
-        # Only check the openthern when set, enable when opentherm found
-        if value and self.entity_description.quatt_opentherm:
-            value = self.coordinator.boilerOpenTherm()
-
-        return value
+        return self.entity_description.entity_registry_enabled_default
 
 
     @property
     def is_on(self) -> bool:
         """Return true if the binary_sensor is on."""
-        if not self.entity_description.quatt_duo or self.coordinator.heatpump2Active():
-            return self.coordinator.getValue(self.entity_description.key)
-        return False
+        return self.coordinator.getValue(self.entity_description.key)

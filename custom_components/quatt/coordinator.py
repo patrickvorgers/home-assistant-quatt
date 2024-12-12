@@ -92,27 +92,28 @@ class QuattDataUpdateCoordinator(DataUpdateCoordinator):
         """Compute waterDelta."""
         if parent_key is None:
             parent_key = ""
-            temperatureWaterOut = self.getValue("hp2.temperatureWaterOut")
-            temperatureWaterIn = self.getValue("hp1.temperatureWaterIn")
+            heatpump_prefix = "hp2" if self.heatpump2Active() else "hp1"
+            temperature_water_out = self.getValue(f"{heatpump_prefix}.temperatureWaterOut")
+            temperature_water_in = self.getValue("hp1.temperatureWaterIn")
         else:
-            temperatureWaterOut = self.getValue(parent_key + ".temperatureWaterOut")
-            temperatureWaterIn = self.getValue(parent_key + ".temperatureWaterIn")
+            temperature_water_out = self.getValue(f"{parent_key}.temperatureWaterOut")
+            temperature_water_in = self.getValue(f"{parent_key}.temperatureWaterIn")
 
         LOGGER.debug(
             "%s.computedWaterDelta.temperatureWaterOut %s",
             parent_key,
-            temperatureWaterOut,
+            temperature_water_out,
         )
         LOGGER.debug(
             "%s.computedWaterDelta.temperatureWaterIn %s",
             parent_key,
-            temperatureWaterIn,
+            temperature_water_in,
         )
 
-        if temperatureWaterOut is None or temperatureWaterIn is None:
+        if temperature_water_out is None or temperature_water_in is None:
             return None
 
-        return round(temperatureWaterOut - temperatureWaterIn, 2)
+        return round(temperature_water_out - temperature_water_in, 2)
 
     def computedHeatPower(self, parent_key: str | None = None):
         """Compute heatPower."""
@@ -127,29 +128,26 @@ class QuattDataUpdateCoordinator(DataUpdateCoordinator):
         if state not in [2, 3]:
             return 0.0
 
-        if self.heatpump2Active():
-            computedWaterDelta = self.computedWaterDelta(None)
-            temperatureWaterOut = self.getValue("hp2.temperatureWaterOut")
-        else:
-            computedWaterDelta = self.computedWaterDelta("hp1")
-            temperatureWaterOut = self.getValue("hp1.temperatureWaterOut")
-        flowRate = self.getValue("qc.flowRateFiltered")
+        computed_water_delta = self.computedWaterDelta(None)
+        heatpump_prefix = "hp2" if self.heatpump2Active() else "hp1"
+        temperature_water_out = self.getValue(f"{heatpump_prefix}.temperatureWaterOut")
+        flowrate = self.getValue("qc.flowRateFiltered")
 
-        LOGGER.debug("computedHeatPower.computedWaterDelta %s", computedWaterDelta)
-        LOGGER.debug("computedHeatPower.flowRate %s", flowRate)
-        LOGGER.debug("computedHeatPower.temperatureWaterOut %s", temperatureWaterOut)
+        LOGGER.debug("computedHeatPower.computedWaterDelta %s", computed_water_delta)
+        LOGGER.debug("computedHeatPower.flowRate %s", flowrate)
+        LOGGER.debug("computedHeatPower.temperatureWaterOut %s", temperature_water_out)
 
         if (
-            computedWaterDelta is None
-            or flowRate is None
-            or temperatureWaterOut is None
+            computed_water_delta is None
+            or flowrate is None
+            or temperature_water_out is None
         ):
             return None
 
         value = round(
-            computedWaterDelta
-            * flowRate
-            * self.getConversionFactor(temperatureWaterOut),
+            computed_water_delta
+            * flowrate
+            * self.getConversionFactor(temperature_water_out),
             2,
         )
 
@@ -170,31 +168,31 @@ class QuattDataUpdateCoordinator(DataUpdateCoordinator):
             return 0.0
 
         # Retrieve other required values
-        heatpumpWaterOut = (
+        heatpump_water_out = (
             self.getValue("hp2.temperatureWaterOut")
             if self.heatpump2Active()
             else self.getValue("hp1.temperatureWaterOut")
         )
-        flowRate = self.getValue("qc.flowRateFiltered")
-        flowWaterTemperature = self.getValue("flowMeter.waterSupplyTemperature")
+        flowrate = self.getValue("qc.flowRateFiltered")
+        flow_water_temperature = self.getValue("flowMeter.waterSupplyTemperature")
 
         # Log debug information
         LOGGER.debug(
-            "computedBoilerHeatPower.temperatureWaterOut: %s", heatpumpWaterOut
+            "computedBoilerHeatPower.temperatureWaterOut: %s", heatpump_water_out
         )
-        LOGGER.debug("computedBoilerHeatPower.flowRate: %s", flowRate)
+        LOGGER.debug("computedBoilerHeatPower.flowRate: %s", flowrate)
         LOGGER.debug(
-            "computedBoilerHeatPower.waterSupplyTemperature: %s", flowWaterTemperature
+            "computedBoilerHeatPower.waterSupplyTemperature: %s", flow_water_temperature
         )
 
         # Validate other inputs
-        if heatpumpWaterOut is None or flowRate is None or flowWaterTemperature is None:
+        if heatpump_water_out is None or flowrate is None or flow_water_temperature is None:
             return None
 
         # Compute the heat power using the conversion factor
-        conversionFactor = self.getConversionFactor(flowWaterTemperature)
+        conversion_factor = self.getConversionFactor(flow_water_temperature)
         value = round(
-            (flowWaterTemperature - heatpumpWaterOut) * flowRate * conversionFactor, 2
+            (flow_water_temperature - heatpump_water_out) * flowrate * conversion_factor, 2
         )
 
         # Prevent any negative numbers
@@ -202,72 +200,72 @@ class QuattDataUpdateCoordinator(DataUpdateCoordinator):
 
     def computedSystemPower(self, parent_key: str | None = None):
         """Compute total system power."""
-        boilerPower = self.computedBoilerHeatPower(parent_key)
-        heatpumpPower = self.computedPower(parent_key)
+        boiler_power = self.computedBoilerHeatPower(parent_key)
+        heatpump_power = self.computedPower(parent_key)
 
         # Log debug information
-        LOGGER.debug("computedSystemPower.boilerPower: %s", boilerPower)
-        LOGGER.debug("computedSystemPower.heatpumpPower: %s", heatpumpPower)
+        LOGGER.debug("computedSystemPower.boilerPower: %s", boiler_power)
+        LOGGER.debug("computedSystemPower.heatpumpPower: %s", heatpump_power)
 
         # Validate inputs
-        if boilerPower is None or heatpumpPower is None:
+        if boiler_power is None or heatpump_power is None:
             return None
 
-        return float(boilerPower) + float(heatpumpPower)
+        return float(boiler_power) + float(heatpump_power)
 
     def computedPowerInput(self, parent_key: str | None = None):
         """Compute total powerInput."""
-        powerInputHp1 = float(self.getValue("hp1.powerInput", 0))
-        powerInputHp2 = (
+        power_input_hp1 = float(self.getValue("hp1.powerInput", 0))
+        power_input_hp2 = (
             float(self.getValue("hp2.powerInput", 0)) if self.heatpump2Active() else 0
         )
-        return powerInputHp1 + powerInputHp2
+        return power_input_hp1 + power_input_hp2
 
     def computedPower(self, parent_key: str | None = None):
         """Compute total power."""
-        powerHp1 = float(self.getValue("hp1.power", 0))
-        powerHp2 = float(self.getValue("hp2.power", 0)) if self.heatpump2Active() else 0
-        return powerHp1 + powerHp2
+        power_hp1 = float(self.getValue("hp1.power", 0))
+        power_hp2 = float(self.getValue("hp2.power", 0)) if self.heatpump2Active() else 0
+        return power_hp1 + power_hp2
 
     def computedCop(self, parent_key: str | None = None):
         """Compute COP."""
-        electricalPower = self.electricalPower()
-        computedHeatPower = self.computedHeatPower(parent_key)
+        electrical_power = self.electricalPower()
+        computed_heat_power = self.computedHeatPower(parent_key)
 
-        LOGGER.debug("computedCop.electricalPower %s", electricalPower)
-        LOGGER.debug("computedCop.computedHeatPower %s", computedHeatPower)
+        LOGGER.debug("computedCop.electricalPower %s", electrical_power)
+        LOGGER.debug("computedCop.computedHeatPower %s", computed_heat_power)
 
-        if electricalPower is None or computedHeatPower is None:
+        if electrical_power is None or computed_heat_power is None:
             return None
 
-        computedHeatPower = float(computedHeatPower)
-        electricalPower = float(electricalPower)
-        if electricalPower == 0:
+        computed_heat_power = float(computed_heat_power)
+        electrical_power = float(electrical_power)
+        if electrical_power == 0:
             return None
 
-        return round(computedHeatPower / electricalPower, 2)
+        return round(computed_heat_power / electrical_power, 2)
 
     def computedQuattCop(self, parent_key: str | None = None):
         """Compute Quatt COP."""
         if parent_key is None:
-            powerInput = self.computedPowerInput(parent_key)
-            powerOutput = self.computedPower(parent_key)
+            power_input = self.computedPowerInput(parent_key)
+            power_output = self.computedPower(parent_key)
         else:
-            powerInput = self.getValue(parent_key + ".powerInput")
-            powerOutput = self.getValue(parent_key + ".power")
+            power_input = self.getValue(parent_key + ".powerInput")
+            power_output = self.getValue(parent_key + ".power")
 
-        LOGGER.debug("%s.computedQuattCop.powerInput %s", parent_key, powerInput)
-        LOGGER.debug("%s.computedQuattCop.powerOutput %s", parent_key, powerOutput)
+        LOGGER.debug("%s.computedQuattCop.powerInput %s", parent_key, power_input)
+        LOGGER.debug("%s.computedQuattCop.powerOutput %s", parent_key, power_output)
 
-        if powerInput is None or powerOutput is None:
+        if power_input is None or power_output is None:
             return None
 
-        powerOutput = float(powerOutput)
-        powerInput = float(powerInput)
-        if powerInput == 0:
+        power_output = float(power_output)
+        power_input = float(power_input)
+        if power_input == 0:
             return None
 
-        value = round(powerOutput / powerInput, 2)
+        value = round(power_output / power_input, 2)
 
         # Prevent negative sign for 0 values (like: -0.0)
         return math.copysign(0.0, 1) if value == 0 else value
