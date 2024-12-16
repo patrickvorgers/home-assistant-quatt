@@ -6,7 +6,7 @@ from homeassistant.components.binary_sensor import BinarySensorEntityDescription
 from homeassistant.components.sensor import SensorEntityDescription
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
 
-from .const import ATTRIBUTION, DOMAIN
+from .const import ATTRIBUTION, DOMAIN, NAME
 from .coordinator import QuattDataUpdateCoordinator
 
 
@@ -44,10 +44,10 @@ class QuattEntity(CoordinatorEntity):
 
     @property
     def device_info(self):
-        """Return the device info."""
+        """Return the device information."""
         return {
             "identifiers": {(DOMAIN, self._device_id)},
             "name": self._device_name,
-            "manufacturer": "Quatt",
+            "manufacturer": NAME,
             "model": "-",
         }

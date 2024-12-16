@@ -18,46 +18,33 @@ from .const import (
 from .coordinator import QuattDataUpdateCoordinator
 from .entity import QuattBinarySensorEntityDescription, QuattEntity
 
+
+def create_heatpump_sensor_entity_descriptions(prefix: str):
+    """Create the heatpump sensor entity descriptions based on the prefix."""
+    return [
+        QuattBinarySensorEntityDescription(
+            name="Silentmode",
+            key=f"{prefix}.silentModeStatus",
+            translation_key="hp_silentModeStatus",
+            icon="mdi:sleep",
+        ),
+        QuattBinarySensorEntityDescription(
+            name="Limited by COP",
+            key=f"{prefix}.limitedByCop",
+            translation_key="hp_silentModeStatus",
+            icon="mdi:arrow-collapse-up",
+        ),
+        QuattBinarySensorEntityDescription(
+            name="Defrost",
+            key=f"{prefix}.computedDefrost",
+            translation_key="hp_silentModeStatus",
+            icon="mdi:snowflake",
+        ),
+    ]
+
 BINARY_SENSORS = {
-    DEVICE_HEATPUMP1_ID: [
-        QuattBinarySensorEntityDescription(
-            name="Silentmode",
-            key="hp1.silentModeStatus",
-            translation_key="hp_silentModeStatus",
-            icon="mdi:sleep",
-        ),
-        QuattBinarySensorEntityDescription(
-            name="Limited by COP",
-            key="hp1.limitedByCop",
-            translation_key="hp_silentModeStatus",
-            icon="mdi:arrow-collapse-up",
-        ),
-        QuattBinarySensorEntityDescription(
-            name="Defrost",
-            key="hp1.computedDefrost",
-            translation_key="hp_silentModeStatus",
-            icon="mdi:snowflake",
-        ),
-    ],
-    DEVICE_HEATPUMP2_ID: [
-        QuattBinarySensorEntityDescription(
-            name="Silentmode",
-            key="hp2.silentModeStatus",
-            translation_key="hp_silentModeStatus",
-            icon="mdi:sleep",
-        ),
-        QuattBinarySensorEntityDescription(
-            name="Limited by COP",
-            key="hp2.limitedByCop",
-            translation_key="hp_silentModeStatus",
-            icon="mdi:arrow-collapse-up",
-        ),
-        QuattBinarySensorEntityDescription(
-            name="Defrost",
-            key="hp2.computedDefrost",
-            icon="mdi:snowflake",
-        ),
-    ],
+    DEVICE_HEATPUMP1_ID: create_heatpump_sensor_entity_descriptions("hp1"),
+    DEVICE_HEATPUMP2_ID: create_heatpump_sensor_entity_descriptions("hp2"),
     DEVICE_BOILER_ID: [
         QuattBinarySensorEntityDescription(
             name="Boiler",
