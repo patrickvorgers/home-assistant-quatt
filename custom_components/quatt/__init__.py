@@ -61,6 +61,10 @@ from .coordinator_home_battery import QuattHomeBatteryDataUpdateCoordinator
 from .coordinator_local_cic import QuattCicLocalDataUpdateCoordinator
 from .coordinator_remote_cic import QuattCicRemoteDataUpdateCoordinator
 from .coordinator_remote_energy import QuattEnergyDataUpdateCoordinator
+from .repairs import (
+    async_create_remote_auth_issue,
+    async_delete_remote_auth_issue,
+)
 
 PLATFORMS: list[Platform] = [
     Platform.BINARY_SENSOR,
@@ -593,6 +597,8 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
 
             # Authenticate (will use existing tokens if available, or do full auth)
             if await remote_client.authenticate():
+                async_delete_remote_auth_issue(hass, entry)
+
                 # Create remote coordinator only if authentication succeeded
                 remote_coordinator = QuattCicRemoteDataUpdateCoordinator(
                     hass=hass,
@@ -608,6 +614,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
                 coordinators["cic_remote"] = remote_coordinator
             else:
                 LOGGER.error("Failed to authenticate with Quatt remote API")
+                async_create_remote_auth_issue(hass, entry)
 
     # Store coordinators
     hass.data[DOMAIN][entry.entry_id] = coordinators
