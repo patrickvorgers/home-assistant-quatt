@@ -64,11 +64,13 @@ from .coordinator_remote_energy import QuattEnergyDataUpdateCoordinator
 
 PLATFORMS: list[Platform] = [
     Platform.BINARY_SENSOR,
+    Platform.BUTTON,
     Platform.CLIMATE,
     Platform.NUMBER,
     Platform.SELECT,
     Platform.SENSOR,
     Platform.SWITCH,
+    Platform.TIME,
 ]
 
 # Per-hub stores are always keyed as ``quatt_remote_storage_{unique_id}``.

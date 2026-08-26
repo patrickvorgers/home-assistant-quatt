@@ -340,6 +340,39 @@ class QuattCicRemoteApiClient(QuattApiClient):
         _LOGGER.error("CIC settings update failed with status %s", status)
         return False
 
+    async def update_night_window(
+        self,
+        start_hour: int | None,
+        start_minute: int | None,
+        end_hour: int | None,
+        end_minute: int | None,
+    ) -> bool:
+        """Update the CIC night window (30-minute resolution).
+
+        Passing ``None`` for all values resets the window to the Quatt defaults.
+        """
+        if not self._auth.is_authenticated:
+            _LOGGER.error("Cannot update night window: not authenticated")
+            return False
+
+        payload = {
+            "nightTimeStartHour": start_hour,
+            "nightTimeStartMinute": start_minute,
+            "nightTimeEndHour": end_hour,
+            "nightTimeEndMinute": end_minute,
+        }
+        status, _data = await self._auth.request(
+            "PUT",
+            f"/me/cic/{self.cic}/nightWindow",
+            json_body=payload,
+            expected_statuses=(200, 201, 204),
+        )
+        if status in (200, 201, 204):
+            _LOGGER.debug("Night window updated successfully: %s", payload)
+            return True
+        _LOGGER.error("Night window update failed with status %s", status)
+        return False
+
     async def update_chill_action(self, chill_uuid: str, data: dict[str, Any]) -> bool:
         """Update chill device action."""
         if not self._auth.is_authenticated:
