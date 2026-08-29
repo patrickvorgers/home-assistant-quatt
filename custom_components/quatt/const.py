@@ -213,6 +213,9 @@ class AllElectricSupervisoryControlMode(IntEnum):
     STICKY_PUMP_PROTECTION = 10
     PRE_POST_PUMP_TO_CHARGING = 11
     PRE_POST_PUMP_TO_DISCHARGING = 12
+    CHARGE_CHILL_COOLING = 13
+    CHARGE_DYNAMIC_PRICES = 14
+    CHARGE_DYNAMIC_PRICES_CH_BACKUP = 15
 
     @property
     def description(self) -> str:
@@ -227,10 +230,13 @@ class AllElectricSupervisoryControlMode(IntEnum):
             self.CHARGE_CH_BACKUP: "Charge - CH backup",
             self.CH_BACKUP: "CH backup",
             self.DISCHARGE: "Discharge",
-            self.DISCHARGE_CH_BACKUP: "Discharge CH backup",
+            self.DISCHARGE_CH_BACKUP: "Discharge - CH backup",
             self.STICKY_PUMP_PROTECTION: "Sticky pump protection",
             self.PRE_POST_PUMP_TO_CHARGING: "Pre/post pump to charging",
             self.PRE_POST_PUMP_TO_DISCHARGING: "Pre/post pump to discharging",
+            self.CHARGE_CHILL_COOLING: "Charge - chill cooling",
+            self.CHARGE_DYNAMIC_PRICES: "Charge - dynamic prices",
+            self.CHARGE_DYNAMIC_PRICES_CH_BACKUP: "Charge - dynamic prices CH backup",
         }[self]
 
 

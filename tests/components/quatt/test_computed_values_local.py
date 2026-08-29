@@ -414,7 +414,15 @@ def test_computed_supervisory_control_mode(
 
 @pytest.mark.parametrize(
     ("mode", "expected"),
-    [(0, "Idle"), (8, "Discharge"), (99, None)],
+    [
+        (0, "Idle"),
+        (8, "Discharge"),
+        (9, "Discharge - CH backup"),
+        (13, "Charge - chill cooling"),
+        (14, "Charge - dynamic prices"),
+        (15, "Charge - dynamic prices CH backup"),
+        (99, None),
+    ],
 )
 def test_computed_all_e_supervisory_control_mode(
     duo_all_electric_data, mode, expected
