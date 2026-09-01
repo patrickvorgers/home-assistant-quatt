@@ -172,12 +172,14 @@ class SupervisoryControlMode(IntEnum):
     HEATING_HEATPUMP_ONLY = 2
     HEATING_HEATPUMP_PLUS_BOILER = 3
     HEATING_BOILER_ONLY = 4
-    STANDBY_COOLING = 5
-    COOLING = 6
+    CHILL_CIRCULATION = 5
+    CHILL_COOLING = 6
+    STICKY_PUMP_PROTECTION = 95
     ANTIFREEZE_BOILER_ON = 96
     ANTIFREEZE_BOILER_PREPUMP = 97
     ANTIFREEZE_WATER_CIRCULATION = 98
     FAULT_CIRCULATION_PUMP_ON = 99
+    INVALID_CONFIGURATION = 400
 
     @property
     def description(self) -> str:
@@ -188,12 +190,14 @@ class SupervisoryControlMode(IntEnum):
             self.HEATING_HEATPUMP_ONLY: "Heating - heatpump only",
             self.HEATING_HEATPUMP_PLUS_BOILER: "Heating - heatpump + boiler",
             self.HEATING_BOILER_ONLY: "Heating - boiler only",
-            self.STANDBY_COOLING: "Standby - cooling",
-            self.COOLING: "Cooling",
+            self.CHILL_CIRCULATION: "Chill circulation",
+            self.CHILL_COOLING: "Chill cooling",
+            self.STICKY_PUMP_PROTECTION: "Sticky pump protection",
             self.ANTIFREEZE_BOILER_ON: "Anti-freeze protection - boiler on",
             self.ANTIFREEZE_BOILER_PREPUMP: "Anti-freeze protection - boiler pre-pump",
             self.ANTIFREEZE_WATER_CIRCULATION: "Anti-freeze protection - water circulation",
             self.FAULT_CIRCULATION_PUMP_ON: "Fault - circulation pump on",
+            self.INVALID_CONFIGURATION: "Invalid configuration",
         }[self]
 
 

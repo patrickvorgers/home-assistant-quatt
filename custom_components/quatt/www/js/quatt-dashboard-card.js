@@ -105,16 +105,18 @@ class QuattDashboardCard extends LitElement {
         const code = Number.isFinite(mode) ? Math.trunc(mode) : NaN;
         const map = {
             0:  'Standby',
-            1:  'Heating',
-            2:  'Heatpump only',
-            3:  'Heatpump + boiler',
-            4:  'Boiler only',
-            5:  'Standby - cooling',
-            6:  'Cooling',
-            96: 'Boiler on',
-            97: 'Boiler pre-pump',
-            98: 'Water circulation',
-            99: 'Fault',
+            1:  'Standby - heating',
+            2:  'Heating - heatpump only',
+            3:  'Heating - heatpump + boiler',
+            4:  'Heating - boiler only',
+            5:  'Chill circulation',
+            6:  'Chill cooling',
+            95: 'Sticky pump protection',
+            96: 'Anti-freeze protection - boiler on',
+            97: 'Anti-freeze protection - boiler pre-pump',
+            98: 'Anti-freeze protection - water circulation',
+            99: 'Fault - circulation pump on',
+            400: 'Invalid configuration',
         };
         return map[code] ?? 'Unknown';
     }
