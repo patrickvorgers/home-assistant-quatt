@@ -327,13 +327,13 @@ class QuattCicLocalDataUpdateCoordinator(QuattCicDataUpdateCoordinator):
         if state is None:
             return None
 
-        # Codes >= 100 are Commissioning modes
-        if state >= 100:
-            return "Commissioning modes"
-
         try:
             return SupervisoryControlMode(state).description
         except ValueError:
+            # Codes 100-399 are Commissioning modes; anything above that is a
+            # known special state without an explicit mapping.
+            if 100 <= state < 400:
+                return "Commissioning modes"
             return None
 
     def computed_all_e_supervisory_control_mode(self) -> str | None:
@@ -369,9 +369,7 @@ class QuattCicLocalDataUpdateCoordinator(QuattCicDataUpdateCoordinator):
         except ValueError:
             return None
 
-    def get_computed_value(
-        self, value_path: str, default: Any | None = None
-    ) -> Any:
+    def get_computed_value(self, value_path: str, default: Any | None = None) -> Any:
         """Invoke a computed method by dot notation."""
         parent_key, _, method_name = value_path.rpartition(".")
         method = getattr(self, method_name, None)
