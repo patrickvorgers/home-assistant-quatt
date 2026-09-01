@@ -369,9 +369,7 @@ class QuattCicLocalDataUpdateCoordinator(QuattCicDataUpdateCoordinator):
         except ValueError:
             return None
 
-    def get_computed_value(
-        self, value_path: str, default: Any | None = None
-    ) -> Any:
+    def get_computed_value(self, value_path: str, default: Any | None = None) -> Any:
         """Invoke a computed method by dot notation."""
         parent_key, _, method_name = value_path.rpartition(".")
         method = getattr(self, method_name, None)
