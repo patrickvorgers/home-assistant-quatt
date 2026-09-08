@@ -14,6 +14,7 @@ from custom_components.quatt.coordinator_local_cic import (
 from custom_components.quatt.coordinator_remote_cic import (
     QuattCicRemoteDataUpdateCoordinator,
 )
+from custom_components.quatt.entity import QuattSensor, QuattSensorEntityDescription
 from custom_components.quatt.sensor_descriptions_cic import (
     CIC_SENSORS,
     FLOWMETER_SENSORS,
@@ -90,7 +91,7 @@ def test_local_description_keys_resolve_against_fixture(description) -> None:
 
 
 def _remote_descriptions():
-    """Yield remote (mobile API) heatpump descriptions for the duo system."""
+    """Yield remote descriptions using the standard raw API value lookup."""
     tables = {
         "CIC_SENSORS": CIC_SENSORS,
         "HEATPUMP_1": create_heatpump_sensor_entity_descriptions(
@@ -108,12 +109,16 @@ def _remote_descriptions():
                 continue
             if description.computed_key:
                 continue
+            if description.quatt_entity_class.native_value is not QuattSensor.native_value:
+                continue
             yield pytest.param(description, id=f"{table_name}:{description.key}")
 
 
 @pytest.mark.parametrize("description", list(_remote_descriptions()))
-def test_remote_description_keys_resolve_against_fixture(description) -> None:
-    """Every applicable remote sensor key resolves in a real API payload."""
+def test_remote_description_keys_resolve_against_fixture(
+    description: QuattSensorEntityDescription,
+) -> None:
+    """Every remote sensor using raw lookup resolves in a real API payload."""
     coordinator = _remote_coordinator()
     value = coordinator.get_value(description.raw_value_key, SENTINEL)
     assert value is not SENTINEL, (

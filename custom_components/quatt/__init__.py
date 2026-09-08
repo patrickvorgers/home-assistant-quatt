@@ -61,6 +61,7 @@ from .coordinator_home_battery import QuattHomeBatteryDataUpdateCoordinator
 from .coordinator_local_cic import QuattCicLocalDataUpdateCoordinator
 from .coordinator_remote_cic import QuattCicRemoteDataUpdateCoordinator
 from .coordinator_remote_energy import QuattEnergyDataUpdateCoordinator
+from .compressor_starts import CompressorStartCounter
 from .device import async_get_device_by_identifier
 from .repairs import (
     async_create_remote_auth_issue,
@@ -664,6 +665,7 @@ def _entry_uses_remote_auth(entry: ConfigEntry) -> bool:
 
 async def async_remove_entry(hass: HomeAssistant, entry: ConfigEntry) -> None:
     """Clean up per-hub storage (and shared auth when the last remote hub leaves)."""
+    await CompressorStartCounter(hass, entry.entry_id).async_remove()
     is_energy = CONF_ENERGY_USERNAME in entry.data
     if entry.unique_id and (_entry_uses_remote_auth(entry) or is_energy):
         hub_store = Store(

@@ -142,5 +142,15 @@
                 }
             }
         }
+    },
+    "entity": {
+        "sensor": {
+            "observed_compressor_starts": {
+                "name": "Observed compressor starts"
+            },
+            "compressor_tracking_since": {
+                "name": "Compressor starts tracked since"
+            }
+        }
     }
 }
