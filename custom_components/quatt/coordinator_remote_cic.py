@@ -10,6 +10,7 @@ from homeassistant.core import HomeAssistant
 import homeassistant.util.dt as dt_util
 
 from .api import QuattApiClient
+from .compressor_starts import CompressorStartCounter
 from .const import (
     BOOST_ACTIVE_STATUSES,
     BOOST_FAST_SCAN_INTERVAL,
@@ -32,12 +33,17 @@ class QuattCicRemoteDataUpdateCoordinator(QuattCicDataUpdateCoordinator):
     ) -> None:
         """Initialize the remote CIC coordinator."""
         super().__init__(hass=hass, update_interval=update_interval, client=client)
+        self.compressor_starts = CompressorStartCounter(
+            hass, self.config_entry.entry_id
+        )
         self._configured_update_interval = update_interval
         self._boost_fast_scan_until: datetime | None = None
 
-    async def _async_update_data(self):
-        """Fetch data and adapt the poll interval to the boost state."""
+    async def _async_update_data(self) -> Any:
+        """Fetch data, persist observed starts and adapt the boost poll interval."""
+        await self.compressor_starts.async_load()
         data = await super()._async_update_data()
+        await self.compressor_starts.async_update(data, dt_util.utcnow())
         self.update_interval = self._next_update_interval(data)
         return data
 

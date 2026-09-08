@@ -12,6 +12,10 @@ from homeassistant.const import (
 )
 
 from .entity import QuattFeatureFlags, QuattSensorEntityDescription
+from .sensor_compressor_starts import (
+    QuattCompressorTrackingSinceSensor,
+    QuattObservedCompressorStartsSensor,
+)
 
 
 def create_heatpump_sensor_entity_descriptions(
@@ -121,6 +125,28 @@ def create_heatpump_sensor_entity_descriptions(
             entity_category=EntityCategory.DIAGNOSTIC,
             quatt_features=QuattFeatureFlags(
                 duo=is_duo,
+            ),
+        ),
+        QuattSensorEntityDescription(
+            key=f"{prefix}.observedCompressorStarts",
+            translation_key="observed_compressor_starts",
+            icon="mdi:counter",
+            state_class=SensorStateClass.TOTAL,
+            suggested_display_precision=0,
+            quatt_entity_class=QuattObservedCompressorStartsSensor,
+            quatt_features=QuattFeatureFlags(
+                duo=is_duo,
+                mobile_api=True,
+            ),
+        ),
+        QuattSensorEntityDescription(
+            key=f"{prefix}.compressorTrackingSince",
+            translation_key="compressor_tracking_since",
+            device_class=SensorDeviceClass.TIMESTAMP,
+            quatt_entity_class=QuattCompressorTrackingSinceSensor,
+            quatt_features=QuattFeatureFlags(
+                duo=is_duo,
+                mobile_api=True,
             ),
         ),
         QuattSensorEntityDescription(

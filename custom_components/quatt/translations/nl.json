@@ -142,5 +142,15 @@
                 }
             }
         }
+    },
+    "entity": {
+        "sensor": {
+            "observed_compressor_starts": {
+                "name": "Waargenomen compressorstarts"
+            },
+            "compressor_tracking_since": {
+                "name": "Compressorstarts bijgehouden sinds"
+            }
+        }
     }
 }
